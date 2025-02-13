@@ -2,7 +2,7 @@
 import notyf from '@/utils/notificacion'
 import { Trash2, Eye } from 'lucide-react'
 import { useState } from 'react'
-import VideoSee from '../Modal/videoSee'
+import VideoSee from '../Modal/VideoSee'
 
 
 export default function VideosDubbed({ videos, setVideos,setDisabled }) {
