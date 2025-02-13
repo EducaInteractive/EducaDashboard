@@ -4,7 +4,7 @@ import notyf from "@/utils/notificacion";
 import { CheckCircle, X } from "lucide-react";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import VideosDubbed from "@/components/dubbing/videosDubbed";
+import VideosDubbed from '@/components/dubbing/VideosDubbed';
 import { getSession } from "next-auth/react";
 import { useDisabled } from "@/contexts/DisabledContext";
 
