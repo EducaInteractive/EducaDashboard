@@ -42,15 +42,6 @@ export default function VideosDubbed({ videos, setVideos,setDisabled }) {
     const downloadVideo = async (idVideo) => {
         if (!idVideo) return;
         setIsDownloading(prev => ({ ...prev, [idVideo]: true }));
-
-        const urlsLocal = JSON.parse(sessionStorage.getItem("urls")) || [];
-        const findId = urlsLocal.find(i => i.idVideo === idVideo);
-        if (findId) {
-            setUrl(findId.url);
-            setIsOpen(true);
-            setIsDownloading(prev => ({ ...prev, [idVideo]: false }));
-            return;
-        }
         setDisabled(true)
         try {
             const res = await fetch(`/api/videos-dubbed?idVideo=${idVideo}`);
@@ -59,8 +50,6 @@ export default function VideosDubbed({ videos, setVideos,setDisabled }) {
                 const url = window.URL.createObjectURL(blob);
                 setUrl(url);
                 setIsOpen(true);
-                const newUrls = [...urlsLocal, { idVideo, url }];
-                sessionStorage.setItem("urls", JSON.stringify(newUrls));
             }
             else if (res.status === 402) {
                 notyf.error("¡El video aun se esta doblando!")
