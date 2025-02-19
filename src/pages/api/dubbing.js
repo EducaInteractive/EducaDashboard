@@ -98,7 +98,7 @@ export default async function dubbing(req, res) {
         const clientMongo=await clientPromise;
         const db = clientMongo.db("proyecto_educa");
         const collect = db.collection("dubbing");
-        const videoDubbed={idVideo:result.dubbing_id,name:name,targetLang:targetLang,email:email};
+        const videoDubbed={idVideo:result.dubbing_id,name:name,targetLang:targetLang,email:email,status:"creating"};
         await collect.insertOne(videoDubbed);
 
         return res.status(200).json(result);

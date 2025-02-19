@@ -230,7 +230,7 @@ function dubbing({ videosDubbedArray }) {
             }
             if (response.ok) {
                 const data = await response.json();
-                setLocalVideosDubbed(prev => [...(prev || []), { idVideo: data.dubbing_id, name: name, targetLang: languagetarget }]);
+                setLocalVideosDubbed(prev => [...(prev || []), { idVideo: data.dubbing_id, name: name, targetLang: languagetarget,status:"creating" }]);
                 setIsSuccess(true);
                 setVideoFile(null);
                 setUrl("");
