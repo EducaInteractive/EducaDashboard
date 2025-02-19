@@ -1,4 +1,3 @@
-// components/Modal/VideoSee.jsx
 "use client";
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
@@ -7,14 +6,26 @@ import { X } from "lucide-react";
 export default function VideoSee({ isOpen, closeModal, src }) {
     const [videoError, setVideoError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
-    // Reset estados cuando cambia el src
     useEffect(() => {
         setVideoError(false);
         setIsLoading(true);
+        setIsVideoLoaded(false);
     }, [src]);
 
     if (!src) return null;
+
+    const handleDownload = () => {
+        if (isVideoLoaded) {
+            const link = document.createElement("a");
+            link.href = src;
+            link.download = "video-dubbing.mp4";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
 
     return (
         <Transition appear show={isOpen} as={Fragment}>
@@ -70,6 +81,7 @@ export default function VideoSee({ isOpen, closeModal, src }) {
                                         playsInline
                                         className={`w-full ${isLoading ? 'hidden' : ''}`}
                                         onLoadedData={() => setIsLoading(false)}
+                                        onCanPlayThrough={() => setIsVideoLoaded(true)}
                                         onError={(e) => {
                                             console.error('Error video:', e);
                                             setVideoError(true);
@@ -86,6 +98,13 @@ export default function VideoSee({ isOpen, closeModal, src }) {
                                             }}
                                         />
                                     </video>
+                                    <button
+                                        onClick={handleDownload}
+                                        disabled={!isVideoLoaded}
+                                        className={`mt-4 px-4 py-2 text-white font-semibold rounded ${isVideoLoaded ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400 cursor-not-allowed'}`}
+                                    >
+                                        Descargar Video
+                                    </button>
                                 </div>
                             </div>
                         </Transition>
