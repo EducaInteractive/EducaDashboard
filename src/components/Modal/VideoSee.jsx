@@ -7,23 +7,31 @@ export default function VideoSee({ isOpen, closeModal, src }) {
     const [videoError, setVideoError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false); 
 
     useEffect(() => {
         setVideoError(false);
         setIsLoading(true);
         setIsVideoLoaded(false);
+        setIsDownloading(false); 
     }, [src]);
 
     if (!src) return null;
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         if (isVideoLoaded) {
+            setIsDownloading(true); 
+
             const link = document.createElement("a");
             link.href = src;
             link.download = "video-dubbing.mp4";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+
+            setTimeout(() => {
+                setIsDownloading(false); 
+            }, 2000);
         }
     };
 
@@ -100,10 +108,18 @@ export default function VideoSee({ isOpen, closeModal, src }) {
                                     </video>
                                     <button
                                         onClick={handleDownload}
-                                        disabled={!isVideoLoaded}
-                                        className={`mt-4 px-4 py-2 text-white font-semibold rounded ${isVideoLoaded ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400 cursor-not-allowed'}`}
+                                        disabled={!isVideoLoaded || isDownloading}
+                                        className={`mt-4 px-4 py-2 text-white font-semibold rounded flex justify-center items-center gap-2 
+                                            ${isVideoLoaded && !isDownloading ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400 cursor-not-allowed'}`}
                                     >
-                                        Descargar Video
+                                        {isDownloading ? (
+                                            <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                            </svg>
+                                        ) : (
+                                            "Descargar Video"
+                                        )}
                                     </button>
                                 </div>
                             </div>
