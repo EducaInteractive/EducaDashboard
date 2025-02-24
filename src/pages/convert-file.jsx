@@ -107,7 +107,7 @@ function ConvertFile() {
                                         />
                                     </label>
                                 </div>
-                                <p className="text-xs text-gray-500">WAV o MP3 hasta 10MB</p>
+                                <p className="text-xs text-gray-500">OGG, WAV, MPGE, O MP4 hasta 25MB</p>
                             </div>
                         </div>
                         {audioFile && (
