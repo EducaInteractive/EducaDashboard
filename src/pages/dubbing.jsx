@@ -52,13 +52,12 @@ function dubbing({ videosDubbedArray }) {
     const [name, setName] = useState('')
     const [url, setUrl] = useState('')
     const [numSpeakers, setNumSpeakers] = useState('1')
-    const [languageSource, setLanguageSource] = useState('Detect')
+    const [languageSource, setLanguageSource] = useState('en')
     const [languagetarget, setLanguageTarget] = useState('en')
 
     const { data: session } = useSession()
 
     const languagesSources = [
-        { id: "detect", language: "Detect" },
         { id: "en", language: "English" },
         { id: "af", language: "Afrikaans" },
         { id: "ar", language: "Arabic" },
@@ -204,7 +203,7 @@ function dubbing({ videosDubbedArray }) {
                 formData.append('name', name);
                 formData.append('email', session.user.email);
                 formData.append('videoFile', videoFile);
-                formData.append('sourceLang', languageSource === 'Detect' ? 'auto' : languageSource);
+                formData.append('sourceLang', languageSource);
                 formData.append('targetLang', languagetarget);
                 formData.append('numSpeakers', numSpeakers);
 
@@ -222,7 +221,7 @@ function dubbing({ videosDubbedArray }) {
                         name: name,
                         email: session.user.email,
                         videoUrl: url,
-                        sourceLang: languageSource === 'Detect' ? 'auto' : languageSource,
+                        sourceLang: languageSource,
                         targetLang: languagetarget,
                         numSpeakers: numSpeakers,
                     }),
@@ -230,7 +229,7 @@ function dubbing({ videosDubbedArray }) {
             }
             if (response.ok) {
                 const data = await response.json();
-                setLocalVideosDubbed(prev => [...(prev || []), { idVideo: data.dubbing_id, name: name, targetLang: languagetarget,status:"creating" }]);
+                setLocalVideosDubbed(prev => [...(prev || []), { idVideo: data.dubbing_id, name: name, targetLang: languagetarget, status: "creating" }]);
                 setIsSuccess(true);
                 setVideoFile(null);
                 setUrl("");
@@ -375,12 +374,16 @@ function dubbing({ videosDubbedArray }) {
                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                             onChange={(e) => setLanguageSource(e.target.value)}
                             required
+                            value={languageSource}
                         >
                             {languagesSources.map((l) => (
-                                <option key={l.id} value={l.id}>{l.language}</option>
+                                <option key={l.id} value={l.id}>
+                                    {l.language} {languageSource === l.id ? "✔️" : ""}
+                                </option>
                             ))}
                         </select>
                     </div>
+
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -392,7 +395,9 @@ function dubbing({ videosDubbedArray }) {
                             required
                         >
                             {languagesTarget.map((l) => (
-                                <option key={l.id} value={l.id}>{l.language}</option>
+                                <option key={l.id} value={l.id}>
+                                    {l.language} {languagetarget === l.id ? "✔️" : ""}
+                                </option>
                             ))}
                         </select>
                     </div>

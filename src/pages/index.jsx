@@ -1,5 +1,5 @@
 "use client"
-import { Waves, Sparkles, Rocket } from 'lucide-react';
+import { Waves, Sparkles, Rocket,Languages } from 'lucide-react';
 import Link from 'next/link';
 
 function Home() {
@@ -41,6 +41,19 @@ function Home() {
               </p>
             </div>
           </Link>
+
+          <Link href="/dubbing">
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer ">
+              <div className="flex items-center  mb-4 text-purple-600">
+                <Languages className="w-6 h-6 mr-2" />
+                <h2 className="text-xl font-semibold">Dubbing</h2>
+              </div>
+              <p className="text-gray-600">
+                Dobla videos a travez de archivos o url a mas de 20 idioma, de una manera profesional y rapida.
+              </p>
+            </div>
+          </Link>
+
         </div>
 
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-8 rounded-xl">

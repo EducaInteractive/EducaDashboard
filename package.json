@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
+    "cloudconvert": "^2.3.7",
     "dotenv": "^16.4.7",
     "elevenlabs": "^1.50.2",
     "formidable": "^3.5.2",

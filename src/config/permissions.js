@@ -10,4 +10,5 @@ export const ROLES = {
     'home-page': ['user', 'admin'],
     'manage-users': ['admin'],  
     'dubbing': ['user', 'admin'],  
+    'convert-file': ['user', 'admin'],  
   };

@@ -89,7 +89,7 @@ export default function VideosDubbed({ videos, setVideos, setDisabled }) {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {videos.map((v) => {
                                 const langObj = languagesTarget.find((l) => l.id === v.targetLang);
-                                const color=v.status==="failed"?"bg-red-500":v.status==="dubbed"?"bg-green-600":"border-yellow-300";
+                                const color=v.status==="failed"?"bg-red-500":v.status==="dubbed"?"bg-green-600":v.status==="dubbing"?"bg-yellow-400":"";
                                 return (
                                     <tr key={v.idVideo}>
                                         <td className="px-6 py-4 whitespace-nowrap">

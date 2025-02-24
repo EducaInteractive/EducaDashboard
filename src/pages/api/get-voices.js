@@ -10,9 +10,10 @@ export default async function getVoices(req, res) {
         if(!email)return res.status(400).json({error:"Falta email"});
         
         const findVoices=await collect.findOne({email:email});
-        if(!findVoices)return res.status(400).json({message:"no hay voces para este email"})
-        
-        return res.status(200).json({voices:findVoices.voices})
+        if(findVoices){
+            return res.status(200).json({voices:findVoices.voices})
+        }
+        return res.status(200).json({voices:[]})
 
     } catch (error) {
         return res.status(500).json({error:"error de coneccion en db"});
