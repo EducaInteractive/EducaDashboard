@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import SchemaGenerated from "@/components/desing-course/schema/schema-generated";
+import SchemaGenerated from "./Schema-generated";
 import { useSession } from "next-auth/react";
 import notyf from "@/utils/notificacion";
 
