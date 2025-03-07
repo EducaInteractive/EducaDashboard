@@ -23,7 +23,7 @@ export default function ModalEdit({ isOpen, closeModal, title, children, user, n
 
         setEditing(true)
         try {
-            const response = await fetch('/api/manage-users', {
+            const response = await fetch('/api/users/manage-users', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

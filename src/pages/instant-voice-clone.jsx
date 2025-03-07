@@ -16,7 +16,7 @@ export async function getServerSideProps(context) {
   }
   if (session.user && session.user.email) {
 
-    const amountVoicesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/voices?email=${session.user.email}`);
+    const amountVoicesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/voices/voices?email=${session.user.email}`);
     const amountVoicesData = await amountVoicesRes.json();
 
     return {
@@ -59,7 +59,7 @@ function InstantVoiceClone({ amountVoicesClo }) {
 
   const fetchVoices = async () => {
     try {
-      const res = await fetch(`/api/get-voices?email=${session.user.email}`);
+      const res = await fetch(`/api/voices/get-voices?email=${session.user.email}`);
 
       if (res.ok) {
         const data = await res.json();
@@ -103,7 +103,7 @@ function InstantVoiceClone({ amountVoicesClo }) {
 
     
     try {
-      const resul = await fetch(`/api/upload-audio`, {
+      const resul = await fetch(`/api/voice-clone/upload-audio`, {
         method: "POST",
         body: formData,
       });
@@ -153,7 +153,7 @@ function InstantVoiceClone({ amountVoicesClo }) {
     if (!voice) return false;
 
     if (window.confirm(`Desea eliminar la voz: ${voice.name}?`)) {
-      const res = await fetch(`/api/voices?voiceId=${voice.id}`, { method: "DELETE" })
+      const res = await fetch(`/api/voices/voices?voiceId=${voice.id}`, { method: "DELETE" })
       if (res.ok) {
         setVoices((prev) => {
           const updatedVoices = prev.filter((v) => v.id !== voice.id);
@@ -183,7 +183,7 @@ function InstantVoiceClone({ amountVoicesClo }) {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-8">
+    <div className="min-h-screen  p-8">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Clonación de Voz</h1>

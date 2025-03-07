@@ -1,10 +1,14 @@
 "use client"
-import { Waves, Sparkles, Rocket,Languages } from 'lucide-react';
+import { Waves, Sparkles, Rocket, Languages, StepForwardIcon,FileArchive } from 'lucide-react';
+import { useDisabledTour } from '@/contexts/DisabledContext';
 import Link from 'next/link';
 
 function Home() {
+
+  const { setDisabledTour } = useDisabledTour();
+
   return (
-    <div className="sm:h-[890px] h-[1000px] bg-gradient-to-b from-white to-gray-50 p-8">
+    <div className="sm:h-[890px] h-screen min-h-min  p-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12 space-y-4">
           <h1 className="text-4xl font-bold text-gray-800 mb-6">
@@ -13,6 +17,18 @@ function Home() {
           <p className="text-lg text-gray-600 leading-relaxed">
             Tu portal a la transformación de voz con ElevenLabs
           </p>
+        </div>
+
+        <div className='mt-10 mb-10'>
+          <div className="bg-slate-300 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer " onClick={() => setDisabledTour(true)}>
+            <div className="flex items-center  mb-4 text-purple-600">
+              <StepForwardIcon className="w-6 h-6 mr-2" />
+              <h2 className="text-xl font-semibold">Iniciar tutorial</h2>
+            </div>
+            <p className="text-gray-600">
+              Inicia un tutorial rapido, explicando el funcionamiento de las herramientas.
+            </p>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
@@ -49,7 +65,21 @@ function Home() {
                 <h2 className="text-xl font-semibold">Dubbing</h2>
               </div>
               <p className="text-gray-600">
-                Dobla videos a travez de archivos o url a mas de 20 idioma, de una manera profesional y rapida.
+                Dobla videos a travez de archivos o url con la utlima tecnología a mas de 20 idioma, de una manera profesional y rapida.
+              </p>
+            </div>
+          </Link>
+
+
+          <Link href="/convert-file">
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer ">
+              <div className="flex items-center  mb-4 text-purple-600">
+                <FileArchive className="w-6 h-6 mr-2" />
+                <h2 className="text-xl font-semibold">Convert file</h2>
+              </div>
+              <p className="text-gray-600">
+                Convierte tus archivos OGG, WAV, MPGE, O MP4 a MP3,
+                 puedes subir un video con formato MP4 y extraerle el audio.
               </p>
             </div>
           </Link>

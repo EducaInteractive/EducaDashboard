@@ -17,7 +17,7 @@ export async function getServerSideProps(context) {
   }
 
   if (session.user && session.user.email) {
-    const voicesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/get-voices?email=${session.user.email}`);
+    const voicesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/voices/get-voices?email=${session.user.email}`);
     const voicesData = await voicesRes.json();
     return {
       props: {
@@ -62,7 +62,7 @@ function TextToSpeech({ voices }) {
     setDisabled(true)
 
     try {
-      const response = await fetch('/api/upload-text', {
+      const response = await fetch('/api/text-to-speech/upload-text', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ function TextToSpeech({ voices }) {
     }
   };
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-8">
+    <div className="min-h-screen  p-8">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Texto a Voz</h1>

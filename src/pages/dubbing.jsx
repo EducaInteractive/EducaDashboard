@@ -21,7 +21,7 @@ export async function getServerSideProps(context) {
     }
     if (session.user && session.user.email) {
 
-        const videosDubbedRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/get-videos-dubbed?email=${session.user.email}`);
+        const videosDubbedRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dubbing/get-videos-dubbed?email=${session.user.email}`);
         const videosDubbedData = await videosDubbedRes.json();
 
         return {
@@ -207,12 +207,12 @@ function dubbing({ videosDubbedArray }) {
                 formData.append('targetLang', languagetarget);
                 formData.append('numSpeakers', numSpeakers);
 
-                response = await fetch('/api/dubbing', {
+                response = await fetch('/api/dubbing/dubbing', {
                     method: 'POST',
                     body: formData,
                 });
             } else if (typeVideo === 'url' && url) {
-                response = await fetch('/api/dubbing', {
+                response = await fetch('/api/dubbing/dubbing', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -246,7 +246,7 @@ function dubbing({ videosDubbedArray }) {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-8">
+        <div className="min-h-screen  p-8">
             <div className="max-w-2xl mx-auto">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-800">Traductor de videos</h1>

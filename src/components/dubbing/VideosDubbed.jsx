@@ -21,7 +21,7 @@ export default function VideosDubbed({ videos, setVideos, setDisabled }) {
         if (window.confirm(`Estas seguro que desea eliminar a: ${video.name}`)) {
             setIsDeleting(prev => ({ ...prev, [video.idVideo]: true }));
             try {
-                const res = await fetch(`/api/videos-dubbed?idVideo=${video.idVideo}`, { method: "DELETE" })
+                const res = await fetch(`/api/dubbing/videos-dubbed?idVideo=${video.idVideo}`, { method: "DELETE" })
                 if (res.ok) {
                     notyf.success("video borrado con exito!");
                     setIsDeleting(prev => ({ ...prev, [video.idVideo]: false }));
@@ -43,11 +43,11 @@ export default function VideosDubbed({ videos, setVideos, setDisabled }) {
         setDisabled(true);
         setIsDownloading(prev => ({ ...prev, [idVideo]: true }));
         try {
-            const checkResponse = await fetch(`/api/checkDubbing?idVideo=${idVideo}`);
+            const checkResponse = await fetch(`/api/dubbing/checkDubbing?idVideo=${idVideo}`);
             const checkData = await checkResponse.json();
 
             if (checkResponse.ok && checkData.status === "dubbed") {
-                setUrl(`/api/videos-dubbed?idVideo=${idVideo}&t=${Date.now()}`);
+                setUrl(`/api/dubbing/videos-dubbed?idVideo=${idVideo}&t=${Date.now()}`);
                 setIsOpen(true);
             } else if (checkData.status !== "dubbed" && checkData.status !== "failed") {
                 setVideos((prev)=>prev.map((v)=>v.idVideo===idVideo?{...v,status:checkData.status}:v))

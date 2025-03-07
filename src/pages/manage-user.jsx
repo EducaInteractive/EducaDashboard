@@ -28,7 +28,7 @@ export default function PageManageUser() {
             setIsLoading(false)
         } else {
             try {
-                const response = await fetch('/api/manage-users');
+                const response = await fetch('/api/users/manage-users');
                 const data = await response.json();
                 setUsers(data.users);
                 sessionStorage.setItem("users", JSON.stringify(data.users))
@@ -62,7 +62,7 @@ export default function PageManageUser() {
         if (!rol || !email) return notyf.error("Complete los campos");
         setIsSubmitting(true);
         try {
-            const response = await fetch('/api/manage-users', {
+            const response = await fetch('/api/users/manage-users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default function PageManageUser() {
     const handleDelete = async (email) => {
         if (window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
             try {
-                const response = await fetch(`/api/manage-users?email=${email}`, {
+                const response = await fetch(`/api/users/manage-users?email=${email}`, {
                     method: 'DELETE',
                 });
                 if (response.ok) {
