@@ -9,8 +9,8 @@ export default async function courseData(req, res) {
 
         if (req.method === "POST") {
             try {
-                const { email, tema, content, knowledge } = req.body;
-                if (!email || !tema || !content || !knowledge) return res.status(400).json({ error: "Faltan datos" });
+                const { email, tema, content, knowledge,people } = req.body;
+                if (!email || !tema || !content || !knowledge||!people) return res.status(400).json({ error: "Faltan datos" });
 
                 const existingDoc = await collect.findOne({ email });
 
@@ -18,12 +18,12 @@ export default async function courseData(req, res) {
 
                     await collect.updateOne(
                         { email },
-                        { $set: { tema, content, knowledge } }
+                        { $set: { tema, content, knowledge,people } }
                     );
                     return res.status(200).json({ message: "Datos actualizados" });
                 } else {
 
-                    const object = { email, tema, content, knowledge };
+                    const object = { email, tema, content, knowledge,people };
                     await collect.insertOne(object);
                     return res.status(200).json({ message: "Datos guardados" });
                 }

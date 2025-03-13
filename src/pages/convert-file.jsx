@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Upload, CheckCircle, X } from "lucide-react";
 import notyf from "@/utils/notificacion";
 import { useDisabled } from "@/contexts/DisabledContext";
+import { convertAudioFile } from "services/convert-audio-file";
 
 function ConvertFile() {
     const { setDisabled } = useDisabled();
@@ -12,30 +13,30 @@ function ConvertFile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!audioFile) return notyf.error("Cargue un archivo");
+        if (!audioFile) {
+          notyf.error("Cargue un archivo");
+          return;
+        }
+        
         setIsSubmitting(true);
         setDisabled(true);
-
-        const formData = new FormData();
-        formData.append("file", audioFile);
+    
         try {
-            const res = await fetch("/api/convert-file", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                setUrl(data.url);
-                setIsSuccess(true);
-            }
+          const result = await convertAudioFile(audioFile);
+          
+          if (result.success) {
+            setUrl(result.url);
+            setIsSuccess(true);
+          } else {
+            notyf.error(result.error || "Hubo un error al convertir el archivo");
+          }
         } catch (error) {
-            notyf.error("Hubo un error al convertir el archivo");
+          notyf.error("Error inesperado al procesar la solicitud");
+        } finally {
+          setIsSubmitting(false);
+          setDisabled(false);
         }
-
-        setIsSubmitting(false);
-        setDisabled(false);
-    };
+      };
 
     useEffect(() => {
         if (isSuccess) {

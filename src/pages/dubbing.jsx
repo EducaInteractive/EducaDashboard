@@ -7,6 +7,8 @@ import { useSession } from "next-auth/react";
 import VideosDubbed from '@/components/dubbing/VideosDubbed';
 import { getSession } from "next-auth/react";
 import { useDisabled } from "@/contexts/DisabledContext";
+import { languagesSources, languagesTarget } from "@/contans";
+import { submitDubbingRequest } from "services/dubbing";
 
 
 export async function getServerSideProps(context) {
@@ -57,94 +59,7 @@ function dubbing({ videosDubbedArray }) {
 
     const { data: session } = useSession()
 
-    const languagesSources = [
-        { id: "en", language: "English" },
-        { id: "af", language: "Afrikaans" },
-        { id: "ar", language: "Arabic" },
-        { id: "hy", language: "Armenian" },
-        { id: "az", language: "Azerbaijani" },
-        { id: "be", language: "Belarusian" },
-        { id: "bs", language: "Bosnian" },
-        { id: "bg", language: "Bulgarian" },
-        { id: "ca", language: "Catalan" },
-        { id: "zh", language: "Chinese" },
-        { id: "hr", language: "Croatian" },
-        { id: "cs", language: "Czech" },
-        { id: "da", language: "Danish" },
-        { id: "nl", language: "Dutch" },
-        { id: "et", language: "Estonian" },
-        { id: "fi", language: "Finnish" },
-        { id: "fr", language: "French" },
-        { id: "gl", language: "Galician" },
-        { id: "de", language: "German" },
-        { id: "el", language: "Greek" },
-        { id: "he", language: "Hebrew" },
-        { id: "hi", language: "Hindi" },
-        { id: "hu", language: "Hungarian" },
-        { id: "is", language: "Icelandic" },
-        { id: "id", language: "Indonesian" },
-        { id: "it", language: "Italian" },
-        { id: "ja", language: "Japanese" },
-        { id: "kn", language: "Kannada" },
-        { id: "kk", language: "Kazakh" },
-        { id: "ko", language: "Korean" },
-        { id: "lv", language: "Latvian" },
-        { id: "lt", language: "Lithuanian" },
-        { id: "mk", language: "Macedonian" },
-        { id: "ms", language: "Malay" },
-        { id: "mr", language: "Marathi" },
-        { id: "mi", language: "Maori" },
-        { id: "ne", language: "Nepali" },
-        { id: "no", language: "Norwegian" },
-        { id: "fa", language: "Persian" },
-        { id: "pl", language: "Polish" },
-        { id: "pt", language: "Portuguese" },
-        { id: "ro", language: "Romanian" },
-        { id: "ru", language: "Russian" },
-        { id: "sr", language: "Serbian" },
-        { id: "sk", language: "Slovak" },
-        { id: "es", language: "Spanish" },
-        { id: "sw", language: "Swahili" },
-        { id: "sv", language: "Swedish" },
-        { id: "tl", language: "Tagalog" },
-        { id: "ta", language: "Tamil" },
-        { id: "th", language: "Thai" },
-        { id: "tr", language: "Turkish" },
-        { id: "uk", language: "Ukrainian" },
-        { id: "ur", language: "Urdu" },
-        { id: "vi", language: "Vietnamese" },
-        { id: "cy", language: "Welsh" }
-    ];
 
-    const languagesTarget = [
-        { id: "en", language: "English" },
-        { id: "zh", language: "Chinese" },
-        { id: "es", language: "Spanish" },
-        { id: "hi", language: "Hindi" },
-        { id: "pt", language: "Portuguese" },
-        { id: "fr", language: "French" },
-        { id: "ja", language: "Japanese" },
-        { id: "de", language: "German" },
-        { id: "ar", language: "Arabic" },
-        { id: "ko", language: "Korean" },
-        { id: "ru", language: "Russian" },
-        { id: "id", language: "Indonesian" },
-        { id: "it", language: "Italian" },
-        { id: "nl", language: "Dutch" },
-        { id: "tr", language: "Turkish" },
-        { id: "pl", language: "Polish" },
-        { id: "sv", language: "Swedish" },
-        { id: "fi", language: "Finnish" },
-        { id: "ms", language: "Malay" },
-        { id: "ro", language: "Romanian" },
-        { id: "el", language: "Greek" },
-        { id: "cs", language: "Czech" },
-        { id: "da", language: "Danish" },
-        { id: "bg", language: "Bulgarian" },
-        { id: "hr", language: "Croatian" },
-        { id: "sk", language: "Slovak" },
-        { id: "ta", language: "Tamil" }
-    ];
 
     useEffect(() => {
         if (isSuccess) {
@@ -180,67 +95,45 @@ function dubbing({ videosDubbedArray }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!name || !typeVideo || !languagetarget || !numSpeakers) return notyf.error("Complete los campos")
-        if (typeVideo === "url") {
-            if (!url) return notyf.error("Complete la URL");
-            if (!url.startsWith("https://")) return notyf.error("La URL debe ser segura (HTTPS)");
-            const unsafeDomains = ["example.com", "malware-site.com", "phishing-site.net"];
-            try {
-                const domain = new URL(url).hostname;
-                if (unsafeDomains.includes(domain)) return notyf.error("La URL no es segura");
-            } catch (error) {
-                return notyf.error("La URL no es válida");
-            }
+
+        if (!name || !typeVideo || !languagetarget || !numSpeakers) {
+            return notyf.error("Complete los campos");
         }
-        if (typeVideo == 'file' && !videoFile) return notyf.error("Cargue el archivo")
-        setDisabled(true)
+
+        setDisabled(true);
         setIsSubmitting(true);
-        try {
-            let response;
 
-            if (typeVideo === 'file' && videoFile) {
-                const formData = new FormData();
-                formData.append('name', name);
-                formData.append('email', session.user.email);
-                formData.append('videoFile', videoFile);
-                formData.append('sourceLang', languageSource);
-                formData.append('targetLang', languagetarget);
-                formData.append('numSpeakers', numSpeakers);
+        const dubbingData = {
+            name,
+            email: session.user.email,
+            sourceLang: languageSource,
+            targetLang: languagetarget,
+            numSpeakers,
+            videoFile: typeVideo === 'file' ? videoFile : null,
+            videoUrl: typeVideo === 'url' ? url : null
+        };
 
-                response = await fetch('/api/dubbing/dubbing', {
-                    method: 'POST',
-                    body: formData,
-                });
-            } else if (typeVideo === 'url' && url) {
-                response = await fetch('/api/dubbing/dubbing', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        email: session.user.email,
-                        videoUrl: url,
-                        sourceLang: languageSource,
-                        targetLang: languagetarget,
-                        numSpeakers: numSpeakers,
-                    }),
-                });
-            }
-            if (response.ok) {
-                const data = await response.json();
-                setLocalVideosDubbed(prev => [...(prev || []), { idVideo: data.dubbing_id, name: name, targetLang: languagetarget, status: "creating" }]);
-                setIsSuccess(true);
-                setVideoFile(null);
-                setUrl("");
-                setName("");
-            }
-            else {
-                notyf.error("error al subir el video")
-            }
-        } catch (error) {
-            console.error('Error al iniciar el doblaje:', error);
+        const result = await submitDubbingRequest(dubbingData);
+
+        if (result.success) {
+            setLocalVideosDubbed(prev => [
+                ...(prev || []),
+                {
+                    idVideo: result.dubbing_id,
+                    name: name,
+                    targetLang: languagetarget,
+                    status: "dubbing",
+                }
+            ]);
+
+            setIsSuccess(true);
+            setVideoFile(null);
+            setUrl("");
+            setName("");
+        } else {
+            notyf.error(result.error || "Error al subir el video");
         }
+
         setIsSubmitting(false);
         setDisabled(false);
     };

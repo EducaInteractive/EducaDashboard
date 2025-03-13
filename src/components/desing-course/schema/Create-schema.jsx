@@ -6,13 +6,14 @@ import { useSession } from "next-auth/react";
 import notyf from "@/utils/notificacion";
 
 
-export default function CreateSchema({ setIsCreateSchema, schema, setSchema, contentCourse, setContentCourse, generatedSchema, setGeneratedSchema,openModal }) {
+export default function CreateSchema({ schema, setSchema, contentCourse, setContentCourse, generatedSchema, setGeneratedSchema,openModal }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isEditing, setIsEditing] = useState(Object.keys(contentCourse).length === 0);
     const [tema, setTema] = useState(contentCourse.tema || "");
     const [content, setContent] = useState(contentCourse.content || "");
     const [knowledge, setKnowledge] = useState(contentCourse.knowledge || "");
+    const [people, setPeople] = useState(contentCourse.people || "");
     const { data: session } = useSession();
 
 
@@ -32,12 +33,13 @@ export default function CreateSchema({ setIsCreateSchema, schema, setSchema, con
                     email: session.user.email,
                     tema,
                     content,
-                    knowledge
+                    knowledge,
+                    people
                 })
             })
 
             if (res.ok) {
-                setContentCourse({ tema, content, knowledge });
+                setContentCourse({ tema, content, knowledge,people });
                 notyf.success("Datos guardados correctamente");
                 setGeneratedSchema(true)
                 setIsEditing(false);
@@ -63,7 +65,8 @@ export default function CreateSchema({ setIsCreateSchema, schema, setSchema, con
                 body: JSON.stringify({
                     tema,
                     content,
-                    knowledge
+                    knowledge,
+                    people
                 }),
             });
 
@@ -116,7 +119,6 @@ export default function CreateSchema({ setIsCreateSchema, schema, setSchema, con
             })
             if (res.ok) {
                 notyf.success("Esquema guardado correctamente")
-                setIsCreateSchema(true)
             }
         } catch (error) {
             console.log(error);
@@ -172,7 +174,7 @@ export default function CreateSchema({ setIsCreateSchema, schema, setSchema, con
 
                         <div>
                             <label htmlFor="knowledge" className="block text-sm font-medium text-gray-700 mb-1">
-                                Conocimientos empíricos *
+                            Contenidos particulares *
                             </label>
                             <input
                                 type="text"
@@ -182,6 +184,20 @@ export default function CreateSchema({ setIsCreateSchema, schema, setSchema, con
                                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                                 placeholder="ej: Experiencia en marketing digital"
                                 onChange={(e) => setKnowledge(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="knowledge" className="block text-sm font-medium text-gray-700 mb-1">
+                            Público objetivo *
+                            </label>
+                            <input
+                                type="text"
+                                id="knowledge"
+                                required
+                                value={people}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                                placeholder="ej: personas jovenes interesadas en marketing"
+                                onChange={(e) => setPeople(e.target.value)}
                             />
                         </div>
 
@@ -230,8 +246,13 @@ export default function CreateSchema({ setIsCreateSchema, schema, setSchema, con
                                 </div>
 
                                 <div>
-                                    <h3 className="text-sm font-medium text-gray-700 mb-1">Conocimientos empíricos</h3>
+                                    <h3 className="text-sm font-medium text-gray-700 mb-1">Contenidos particulares</h3>
                                     <p className="px-4 py-3 bg-gray-50 rounded-lg text-gray-800">{contentCourse.knowledge}</p>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-sm font-medium text-gray-700 mb-1">Público objetivo</h3>
+                                    <p className="px-4 py-3 bg-gray-50 rounded-lg text-gray-800">{contentCourse.people}</p>
                                 </div>
                             </div>
                             <div className="flex justify-center pt-4">

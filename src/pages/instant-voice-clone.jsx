@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, X, CheckCircle, Trash2 } from 'lucide-react';
+import { Upload, X, CheckCircle } from 'lucide-react';
 import { getSession, useSession } from 'next-auth/react';
 import notyf from '@/utils/notificacion';
 import { useDisabled } from '@/contexts/DisabledContext';
+import { getVoices } from 'services/voices';
+import Voices from '@/components/instant-voices-clone/Voices';
+
+
 
 export async function getServerSideProps(context) {
   const session = await getSession(context)
@@ -48,31 +52,23 @@ function InstantVoiceClone({ amountVoicesClo }) {
   const { data: session } = useSession();
   const amountMaxVoices = session?.user?.cantVoices;
 
-  useEffect(() => {
-    const storedVoices = sessionStorage.getItem("voicesi");
-    if (storedVoices) {
-      setVoices(JSON.parse(storedVoices));
-    } else {
-      fetchVoices();
-    }
-  }, []);
-
   const fetchVoices = async () => {
-    try {
-      const res = await fetch(`/api/voices/get-voices?email=${session.user.email}`);
-
-      if (res.ok) {
-        const data = await res.json();
-        setVoices(data.voices);
-        sessionStorage.setItem("voicesi", JSON.stringify(data.voices));
-      } else {
-        notyf.error("Error al cargar las voces");
-      }
-    } catch (error) {
-      console.error("Error fetching voices:", error);
-      notyf.error("Error al conectar con el servidor");
+    if (!session?.user?.email) return;
+    
+    const result = await getVoices(session.user.email);
+    
+    if (result.success) {
+      setVoices(result.voices);
+    } else {
+      notyf.error(result.error);
     }
   };
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetchVoices();
+    }
+  }, [session]);
 
   const VerifyName = () => {
     const searchName = voices.find((n) => String(n.name).toLowerCase() === name.toLowerCase());
@@ -149,37 +145,6 @@ function InstantVoiceClone({ amountVoicesClo }) {
     }
   };
 
-  const deleteVoice = async (voice) => {
-    if (!voice) return false;
-
-    if (window.confirm(`Desea eliminar la voz: ${voice.name}?`)) {
-      const res = await fetch(`/api/voices/voices?voiceId=${voice.id}`, { method: "DELETE" })
-      if (res.ok) {
-        setVoices((prev) => {
-          const updatedVoices = prev.filter((v) => v.id !== voice.id);
-          console.log(updatedVoices);
-          sessionStorage.setItem("voicesi", JSON.stringify(updatedVoices));
-          return updatedVoices;
-        });
-        setLocalAmountVoicesClo((prev) => prev - 1)
-        return notyf.success("Voz eliminada con exito")
-      }
-      else {
-        return notyf.error("error al borrar la voz")
-      }
-    }
-  }
-
-  const formatDate = (isoDate) => {
-    const date = new Date(isoDate);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-  };
 
 
   return (
@@ -316,66 +281,8 @@ function InstantVoiceClone({ amountVoicesClo }) {
         )}
       </div>
 
-      <div className="mt-20 rounded-xl shadow-sm overflow-hidden">
-        <div className='flex justify-center items-center '>
-          <p className='text-3xl font-bold text-gray-800'>Voces clonadas</p>
-        </div>
-        {voices.length === 0 && (
-          <div className='flex items-center justify-center'>
-            <p colSpan="3" className="px-6 py-4 text-center">
-              No hay voces clonadas
-            </p>
-          </div>
-        )}
-        {voices.length > 0 &&
-          <div className="overflow-x-auto mt-5">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Id
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Voz
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fecha Creacion
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Eliminar
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {voices.length > 0 && voices.map((voice) => {
-                  const dateFormated = formatDate(voice.date)
-                  return (
-                    <tr key={voice.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{voice.id}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{voice.name}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{dateFormated}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
-                        <button
-                          onClick={() => deleteVoice(voice)}
-                          className="text-red-600 hover:text-red-900 "
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })
-                }
-              </tbody>
-            </table>
-          </div>
-        }
+      <div>
+        <Voices voices={voices} setLocalAmountVoicesClo={setLocalAmountVoicesClo} setVoices={setVoices} />
       </div>
     </div >
   );
