@@ -16,6 +16,8 @@ export default NextAuth({
                 if(authorizeUser && authorizeUser.role && authorizeUser.cantVoices){
                     user.role=authorizeUser.role;
                     user.cantVoices=authorizeUser.cantVoices;
+                    user.cantRegenerations=authorizeUser.cantRegenerations;
+                    user.cantRegenerationsClass=authorizeUser.cantRegenerationsClass;
                     return true;
                 }
                 return false;
@@ -31,6 +33,8 @@ export default NextAuth({
             if(user){
                 token.role=user.role;
                 token.cantVoices=user.cantVoices;
+                token.cantRegenerations=user.cantRegenerations;
+                token.cantRegenerationsClass=user.cantRegenerationsClass;
             }
             return token;
         },
@@ -39,6 +43,8 @@ export default NextAuth({
             session.user.token = token.accessToken;
             session.user.role=token.role;
             session.user.cantVoices=token.cantVoices;
+            session.user.cantRegenerations=token.cantRegenerations;
+            session.user.cantRegenerationsClass=token.cantRegenerationsClass;
             return session;
         },
     },

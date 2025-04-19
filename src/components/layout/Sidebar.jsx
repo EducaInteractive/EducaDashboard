@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Menu, X, Home, Sparkles, Waves, Users, Languages, ChevronDown, FileArchive,Layers  } from "lucide-react";
+import { Menu, X, Home, Sparkles, Waves, Users, Languages, ChevronDown, FileArchive,Layers,LucidePencilRuler  } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PERMISSIONS } from "@/config/permissions";
@@ -72,8 +72,30 @@ const SideBar = () => {
       id: "step-dubbing",
       text: "Genera doblajes en diferentes idiomas con IA.",
       attachTo: { element: "#dubbing", on: "right" },
+      buttons: [{ text: "Siguiente", action: tour.next }],
+    });
+
+    tour.addStep({
+      id: "create-course",
+      text: "Este es el menú de creacion de cursos.",
+      attachTo: { element: "#create-course", on: "right" },
+      buttons: [
+        {
+          text: "Abrir y continuar",
+          action: () => {
+            setIsCreateCourse(true);
+            setTimeout(() => tour.next(), 500);
+          },
+        },
+      ],
+    });
+    tour.addStep({
+      id: "design-course",
+      text: "Diseña el esquema de las clases de tu curso",
+      attachTo: { element: "#design-course", on: "right" },
       buttons: [{ text: "Finalizar", action: tour.complete }],
     });
+
 
     tour.start();
     setDisabledTour(false)
@@ -129,9 +151,16 @@ const SideBar = () => {
     {
       icon: <Layers  className="w-5 h-5" />,
       label: "Desing Course",
-      link: "/desing-course",
+      link: "/design-course",
       permission: "desing-course",
-      id: "desing-course",
+      id: "design-course",
+    },
+    {
+      icon: <LucidePencilRuler  className="w-5 h-5" />,
+      label: "Create Class",
+      link: "/create-class",
+      permission: "create-class",
+      id: "create-class",
     },
   ]
 
@@ -221,7 +250,7 @@ const SideBar = () => {
           <div className="relative">
             <button
               onClick={() => setIsCreateCourse(!isCreateCourse)}
-              id="eleven-labs"
+              id="create-course"
               className={`w-full flex items-center justify-between p-3 rounded-lg transition-all
                 ${isCreateCourse ? "bg-purple-50 text-purple-600" : "text-gray-700 hover:bg-gray-100"}
                 ${disabled ? "cursor-not-allowed text-gray-400" : ""}`}

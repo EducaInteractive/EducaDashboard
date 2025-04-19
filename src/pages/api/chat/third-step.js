@@ -1,7 +1,6 @@
-import { promtGeneral } from "@/contans";
 import OpenAI from "openai";
+import { promtGeneral } from "@/contans";
 import clientPromise from "@/lib/mongodb";
-
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -12,30 +11,28 @@ export default async function schema(req, res) {
         res.setHeader("Connection", "keep-alive");
 
         try {
-            const { tema, knowledge, people, email } = req.body
+            const { email, tema, knowledge,people } = req.body;
+            if (!email || !tema || !knowledge||!people) {
+                res.status(400).json({ error: "Faltan datos" });
+                return;
+            }
 
-            const prompt1 = promtGeneral
+            //const schemaSave = await findSchema(email);
 
             const prompt = `aqui estan los datos del curso:
             Título del curso: ${tema}, Contenidos particulares: ${knowledge}, personas a las que va dirigido: ${people}.`;
 
             try {
                 const stream = await openai.chat.completions.create({
-                    model: "gpt-4o-mini",
+                    model: "gpt-3.5-turbo",
                     messages: [
-                        {
-                            role: "user",
-                            content: prompt,
-                        },
-                        {
-                            role: "system",
-                            content: prompt1
-                        }
+                        { role: "user", content: prompt },
+                        { role: "system", content: promtGeneral }
                     ],
                     stream: true,
                 });
 
-                let generatedSchema = "";
+                let generatedSchema = ""; 
 
                 for await (const chunk of stream) {
                     const text = chunk.choices[0].delta.content ?? "";
@@ -47,11 +44,14 @@ export default async function schema(req, res) {
                 }
 
                 res.write("\n\n");
-                await saveData(email, generatedSchema);
+
+                await saveData(email, tema, knowledge,people, generatedSchema);
+
                 res.end();
+                return;
             } catch (error) {
                 console.error("Error al crear el chat:", error);
-                res.status(500).json({ error: "Error con el servidor de openai" });
+                res.status(500).json({ error: "Error con el servidor de OpenAI" });
             }
 
         } catch (error) {
@@ -63,18 +63,24 @@ export default async function schema(req, res) {
     }
 }
 
-
-async function saveData(email, schema) {
+async function saveData(email, tema, knowledge, people, schema) {
     const client = await clientPromise;
     const db = client.db("proyecto_educa");
     const collect = db.collection("course");
 
     await collect.updateOne(
-        { email },
-        {
-            $set: { schema },
-            $inc: { count_regenerate: 1 }
-        },
-        { upsert: true }
+        { email }, 
+        { $set: { schema, tema, knowledge, people,count_regenerate:0 } }, 
+        { upsert: true } // Crea el documento si no existe
     );
+}
+
+
+async function findSchema(email) {
+    const client = await clientPromise;
+    const db = client.db("proyecto_educa");
+    const collect = db.collection("course");
+
+    const res = await collect.findOne({ email });
+    return res ? res.schema : null;
 }

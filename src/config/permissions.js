@@ -12,5 +12,6 @@ export const PERMISSIONS = {
   'dubbing': ['user', 'admin'],
   'convert-file': ['user', 'admin'],
   'desing-course': ['user', 'admin'],
+  'create-class': ['user', 'admin'],
 
 };

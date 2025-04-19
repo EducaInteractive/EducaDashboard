@@ -6,7 +6,7 @@ export default async function searchRole(email) {
         const authorizeUser = await db.collection("authorized_user").findOne({ email: email });
         if(!authorizeUser)return {};
         const role=await db.collection("rols").findOne({"_id":authorizeUser.role_id})
-        if(role)return {role:role.role,cantVoices:role.cant_voices}
+        if(role)return {role:role.role,cantVoices:role.cant_voices,cantRegenerations:role.cant_regenerate,cantRegenerationsClass:role.cant_regenerate_class}
     } catch (error) {    
         console.error("error: ",error)
         return {};

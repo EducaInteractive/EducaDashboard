@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState,useEffect,useRef } from "react"
 import SchemaGenerated from "./Schema-generated";
 import { useSession } from "next-auth/react";
 import notyf from "@/utils/notificacion";
 
 
-export default function CreateSchema({ schema, setSchema, contentCourse, setContentCourse, generatedSchema, setGeneratedSchema,openModal }) {
+export default function CreateSchema({ schema, setSchema, contentCourse, setContentCourse, generatedSchema, setGeneratedSchema, openModal }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isEditing, setIsEditing] = useState(Object.keys(contentCourse).length === 0);
@@ -14,13 +14,21 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
     const [content, setContent] = useState(contentCourse.content || "");
     const [knowledge, setKnowledge] = useState(contentCourse.knowledge || "");
     const [people, setPeople] = useState(contentCourse.people || "");
+    const [bibliografy, setBibliografy] = useState(contentCourse.bibliografy || "");
+    const [studies, setStudies] = useState(contentCourse.studies || "");
     const { data: session } = useSession();
 
+    const bottomRef = useRef(null);
+
+    useEffect(() => {
+
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, []);
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!tema || !content || !knowledge) return notyf.error("Falta completar datos")
+        if (!tema || !content || !knowledge || !people || !bibliografy || !studies) return notyf.error("Falta completar datos")
         setIsSubmitting(true)
 
         try {
@@ -34,12 +42,14 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
                     tema,
                     content,
                     knowledge,
-                    people
+                    people,
+                    bibliografy,
+                    studies
                 })
             })
 
             if (res.ok) {
-                setContentCourse({ tema, content, knowledge,people });
+                setContentCourse({ tema, content, knowledge, people,bibliografy,studies });
                 notyf.success("Datos guardados correctamente");
                 setGeneratedSchema(true)
                 setIsEditing(false);
@@ -66,7 +76,9 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
                     tema,
                     content,
                     knowledge,
-                    people
+                    people,
+                    bibliografy,
+                    studies
                 }),
             });
 
@@ -91,7 +103,7 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
             console.error("Error fetching data:", error);
         }
         finally {
-            
+
             setGeneratedSchema(false);
         }
 
@@ -123,7 +135,7 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
         } catch (error) {
             console.log(error);
         }
-        finally{
+        finally {
             setContentCourse((prevContentCourse) => ({
                 ...prevContentCourse,
                 schema: schema
@@ -135,16 +147,12 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
     return (
         <div className="min-h-screen p-8">
             <div className="max-w-2xl mx-auto">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800">Diseña tu curso</h1>
-                    <p className="mt-2 text-gray-600">ayudate de inteligencia artificial para crear tu curso</p>
-                </div>
 
                 {isEditing ? (
                     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-xl shadow-sm">
                         <div>
                             <label htmlFor="tema" className="block text-sm font-medium text-gray-700 mb-1">
-                                Tema *
+                                Titulo *
                             </label>
                             <input
                                 type="text"
@@ -158,7 +166,7 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
                         </div>
                         <div>
                             <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
-                                Contenido principal *
+                                Temas principales
                             </label>
                             <textarea
                                 id="content"
@@ -174,7 +182,7 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
 
                         <div>
                             <label htmlFor="knowledge" className="block text-sm font-medium text-gray-700 mb-1">
-                            Contenidos particulares *
+                                Contenidos particulares *
                             </label>
                             <input
                                 type="text"
@@ -188,7 +196,7 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
                         </div>
                         <div>
                             <label htmlFor="knowledge" className="block text-sm font-medium text-gray-700 mb-1">
-                            Público objetivo *
+                                Público objetivo *
                             </label>
                             <input
                                 type="text"
@@ -198,6 +206,34 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
                                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                                 placeholder="ej: personas jovenes interesadas en marketing"
                                 onChange={(e) => setPeople(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="knowledge" className="block text-sm font-medium text-gray-700 mb-1">
+                                Bibliografias *
+                            </label>
+                            <input
+                                type="text"
+                                id="knowledge"
+                                required
+                                value={people}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                                placeholder="ej: personas jovenes interesadas en marketing"
+                                onChange={(e) => setBibliografy(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="knowledge" className="block text-sm font-medium text-gray-700 mb-1">
+                                Estudios cientificos *
+                            </label>
+                            <input
+                                type="text"
+                                id="knowledge"
+                                required
+                                value={people}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                                placeholder="ej: personas jovenes interesadas en marketing"
+                                onChange={(e) => setStudies(e.target.value)}
                             />
                         </div>
 
@@ -234,12 +270,12 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
 
                             <div className="space-y-4">
                                 <div>
-                                    <h3 className="text-sm font-medium text-gray-700 mb-1">Tema</h3>
+                                    <h3 className="text-sm font-medium text-gray-700 mb-1">Titulo</h3>
                                     <p className="px-4 py-3 bg-gray-50 rounded-lg text-gray-800">{contentCourse.tema}</p>
                                 </div>
 
                                 <div>
-                                    <h3 className="text-sm font-medium text-gray-700 mb-1">Contenido principal</h3>
+                                    <h3 className="text-sm font-medium text-gray-700 mb-1">Temas principales</h3>
                                     <div className="px-4 py-3 bg-gray-50 rounded-lg text-gray-800 max-h-60 overflow-y-auto">
                                         <textarea className="whitespace-pre-line bg-gray-50 w-full" disabled rows={6} defaultValue={contentCourse.content}></textarea>
                                     </div>
@@ -253,6 +289,14 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
                                 <div>
                                     <h3 className="text-sm font-medium text-gray-700 mb-1">Público objetivo</h3>
                                     <p className="px-4 py-3 bg-gray-50 rounded-lg text-gray-800">{contentCourse.people}</p>
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-medium text-gray-700 mb-1">Bibliografias</h3>
+                                    <p className="px-4 py-3 bg-gray-50 rounded-lg text-gray-800">{contentCourse.bibliografy}</p>
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-medium text-gray-700 mb-1">Estudios cientificos</h3>
+                                    <p className="px-4 py-3 bg-gray-50 rounded-lg text-gray-800">{contentCourse.studies}</p>
                                 </div>
                             </div>
                             <div className="flex justify-center pt-4">
@@ -283,6 +327,7 @@ export default function CreateSchema({ schema, setSchema, contentCourse, setCont
                     </div>
                 )}
             </div>
+            <div ref={bottomRef}></div>
         </div>
     )
 }

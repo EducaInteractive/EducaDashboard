@@ -59,7 +59,7 @@ export default function PageManageUser() {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!rol || !email) return notyf.error("Complete los campos");
+        if (!rol || !email.trim()) return notyf.error("Complete los campos");
         setIsSubmitting(true);
         try {
             const response = await fetch('/api/users/manage-users', {

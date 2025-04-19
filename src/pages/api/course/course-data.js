@@ -7,23 +7,25 @@ export default async function courseData(req, res) {
         const db = client.db("proyecto_educa");
         const collect = db.collection("course");
 
-        if (req.method === "POST") {
+       {/* if (req.method === "POST") {
             try {
-                const { email, tema, content, knowledge,people } = req.body;
-                if (!email || !tema || !content || !knowledge||!people) return res.status(400).json({ error: "Faltan datos" });
+                const { email, tema, content, knowledge, people, bibliografy, studies } = req.body;
+                if (!email || !tema || !knowledge || !people || !bibliografy || !studies) return res.status(400).json({ error: "Faltan datos" });
 
                 const existingDoc = await collect.findOne({ email });
+
+                const contentSave = content || "Sin informacion"
 
                 if (existingDoc) {
 
                     await collect.updateOne(
                         { email },
-                        { $set: { tema, content, knowledge,people } }
+                        { $set: { tema, content: contentSave, knowledge, people, bibliografy, studies } }
                     );
                     return res.status(200).json({ message: "Datos actualizados" });
                 } else {
 
-                    const object = { email, tema, content, knowledge,people };
+                    const object = { email, tema, contentSave, knowledge, people, bibliografy, studies };
                     await collect.insertOne(object);
                     return res.status(200).json({ message: "Datos guardados" });
                 }
@@ -33,11 +35,12 @@ export default async function courseData(req, res) {
                 return res.status(500).json({ error: "Error en el servidor" });
             }
         }
-        else if (req.method === "PUT") {
+            */}
+         if (req.method === "PUT") {
             try {
-                const { email,schema } = req.body;
-                console.log(email,schema)
-                if (!email||!schema) return res.status(400).json({ error: "faltan datos" });
+                const { email, schema } = req.body;
+                console.log(email, schema)
+                if (!email || !schema) return res.status(400).json({ error: "faltan datos" });
 
                 await collect.updateOne(
                     { email },
@@ -57,7 +60,7 @@ export default async function courseData(req, res) {
 
                 const data = await collect.findOne({ email });
 
-                if (data) return res.status(200).json({ courseData: data })
+                if (data) return res.status(200).json({ courseData: data})
 
                 return res.status(404).json({ courseData: {}, messsage: "No se encontraron datos" })
 

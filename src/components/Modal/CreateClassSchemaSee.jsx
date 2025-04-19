@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { X } from "lucide-react";
 
-export default function SchemaSee({ isOpen, closeModal, children, schema, setSchema }) {
+export default function CreateClassSchemaSee({ isOpen, closeModal, children, schema }) {
   if (!schema) return null;
 
   return (
@@ -50,7 +50,7 @@ export default function SchemaSee({ isOpen, closeModal, children, schema, setSch
                 <div className="mt-4 max-h-[70vh] overflow-y-auto border border-gray-200 rounded-lg p-4">
                   <textarea
                     value={schema}
-                    onChange={(e) => setSchema(e.target.value)}
+                    readOnly
                     className="w-full h-full resize-none text-sm text-gray-800 whitespace-pre-wrap focus:outline-none"
                     rows={20}
                   />

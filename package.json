@@ -16,6 +16,7 @@
     "formidable": "^3.5.2",
     "framer-motion": "^12.0.6",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.1",
     "lucide-react": "^0.473.0",
     "mongodb": "^6.12.0",
     "next": "15.1.5",

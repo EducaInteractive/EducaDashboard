@@ -57,7 +57,7 @@ function TextToSpeech({ voices }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!text || !voice) return notyf.error("complete los campos requeridos")
+    if (!text.trim() || !voice) return notyf.error("complete los campos requeridos")
     setIsSubmitting(true);
     setDisabled(true)
 

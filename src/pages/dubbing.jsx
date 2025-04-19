@@ -96,7 +96,7 @@ function dubbing({ videosDubbedArray }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!name || !typeVideo || !languagetarget || !numSpeakers) {
+        if (!name.trim() || !typeVideo || !languagetarget || !numSpeakers.trim()) {
             return notyf.error("Complete los campos");
         }
 

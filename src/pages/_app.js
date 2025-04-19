@@ -1,7 +1,6 @@
 import "@/styles/globals.css";
 import MainLayout from "@/components/layout/MainLayout";
 import AuthLayout from "@/components/layout/AuthLayout";
-import { useState } from "react";
 import Head from "next/head";
 import { SessionProvider } from "next-auth/react";
 import { useRouter } from 'next/router';

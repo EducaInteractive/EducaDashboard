@@ -77,7 +77,7 @@ function InstantVoiceClone({ amountVoicesClo }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!audioFile || !name) return notyf.error("Rellene los campos obligatorios!");
+    if (!audioFile || !name.trim()) return notyf.error("Rellene los campos obligatorios!");
 
     if (!consent) return notyf.error("Necesitas darnos tu consentimiento para realizar esta acción");
 
