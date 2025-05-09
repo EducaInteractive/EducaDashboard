@@ -1,7 +1,7 @@
 import { promtGeneral } from "@/contans";
 import OpenAI from "openai";
 import clientPromise from "@/lib/mongodb";
-
+import createLogs from "../logs/allLogs";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -47,6 +47,13 @@ export default async function schema(req, res) {
                 }
 
                 res.write("\n\n");
+                await createLogs(email, 'createCourse', {
+                    tema: tema,
+                    knowledge: knowledge,
+                    people: people,
+                    schema: generatedSchema,
+                    date: new Date().toISOString()
+                });
                 await saveData(email, generatedSchema);
                 res.end();
             } catch (error) {

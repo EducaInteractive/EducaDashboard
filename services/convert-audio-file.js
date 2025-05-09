@@ -3,7 +3,7 @@
  * @param {File} audioFile - El archivo de audio a convertir
  * @returns {Promise<{success: boolean, url: string|null, error: string|null}>} - Resultado de la operación
  */
-export const convertAudioFile = async (audioFile) => {
+export const convertAudioFile = async (audioFile,email) => {
     if (!audioFile) {
       return {
         success: false,
@@ -14,6 +14,7 @@ export const convertAudioFile = async (audioFile) => {
   
     const formData = new FormData();
     formData.append("file", audioFile);
+    formData.append("email", email);
   
     try {
       const res = await fetch("/api/convert-file", {

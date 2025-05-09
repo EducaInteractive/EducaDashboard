@@ -1,6 +1,7 @@
 import { IncomingForm } from "formidable";
 import fs from "fs";
 import Cloudconvert from "cloudconvert";
+import createLogs from "./logs/allLogs";
 
 export const config = {
     api: {
@@ -45,6 +46,7 @@ export default async function convertFile(req, res) {
         const { fields, files } = await processForm();
 
         const file = Array.isArray(files.file) ? files.file[0] : files.file;
+        const email = Array.isArray(fields.email) ? fields.email[0] : fields.email;
         currentFile = file;
 
 
@@ -97,6 +99,12 @@ export default async function convertFile(req, res) {
             const fileUrl = exportTask.result.files[0].url;
 
             fs.unlinkSync(file.filepath);
+
+            await createLogs(email, 'convert_file', {
+                email,
+                file: fileUrl,
+                date: new Date().toISOString(),
+            });
 
             clearTimeout(timeout);
             return res.status(200).json({

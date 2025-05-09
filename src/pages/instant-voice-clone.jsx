@@ -92,7 +92,7 @@ function InstantVoiceClone({ amountVoicesClo }) {
     formData.append("file", audioFile);
     formData.append("name", name);
     formData.append("noise", noise);
-    formData.append("description", description);
+    formData.append("description", description.trim() || "Sin descripción");
     formData.append("amountMaxVoices", amountMaxVoices);
     formData.append("amountVoicesClo", localAmountVoicesClo);
     formData.append("email", session.user.email);

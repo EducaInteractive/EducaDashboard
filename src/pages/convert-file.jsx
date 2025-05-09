@@ -3,6 +3,7 @@ import { Upload, CheckCircle, X } from "lucide-react";
 import notyf from "@/utils/notificacion";
 import { useDisabled } from "@/contexts/DisabledContext";
 import { convertAudioFile } from "services/convert-audio-file";
+import { useSession } from "next-auth/react";
 
 function ConvertFile() {
     const { setDisabled } = useDisabled();
@@ -10,6 +11,7 @@ function ConvertFile() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [url, setUrl] = useState(null);
+    const {data: session } = useSession();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,7 +24,7 @@ function ConvertFile() {
         setDisabled(true);
     
         try {
-          const result = await convertAudioFile(audioFile);
+          const result = await convertAudioFile(audioFile, session?.user?.email);
           
           if (result.success) {
             setUrl(result.url);

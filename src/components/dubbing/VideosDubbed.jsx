@@ -13,7 +13,7 @@ export default function VideosDubbed({ videos, setVideos, setDisabled }) {
     const [isOpen, setIsOpen] = useState(false)
     const [url, setUrl] = useState(null)
 
-    const heads = ["Nombre", "Leng-doblado", "Estado", "Descargar", "Borrar"]
+    const heads = ["Nombre", "Leng doblado", "Estado", "Descargar","Fecha Creacion", "Borrar"]
 
 
     const deleteDubbing = async (video) => {
@@ -90,6 +90,7 @@ export default function VideosDubbed({ videos, setVideos, setDisabled }) {
                             {videos.map((v) => {
                                 const langObj = languagesTarget.find((l) => l.id === v.targetLang);
                                 const color=v.status==="failed"?"bg-red-500":v.status==="dubbed"?"bg-green-600":v.status==="dubbing"?"bg-yellow-400":"";
+                                const dateformated = new Date(v.date).toLocaleDateString().replaceAll("/", "-") + " " + new Date(v.date).toLocaleTimeString().slice(0, 8);
                                 return (
                                     <tr key={v.idVideo}>
                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -119,6 +120,13 @@ export default function VideosDubbed({ videos, setVideos, setDisabled }) {
                                                     <Eye className="h-8 w-5" />
                                                 </button>
                                             )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-900 w-[70px]">
+                                                <p className={`text-center rounded-xl`}>
+                                                    {dateformated}
+                                                </p>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             {isDeleting[v.idVideo] ? (<p>Borrando video...</p>)

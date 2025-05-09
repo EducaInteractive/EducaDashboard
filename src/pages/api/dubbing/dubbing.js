@@ -2,6 +2,7 @@ import { IncomingForm } from 'formidable';
 import fs from 'fs';
 import { ElevenLabsClient } from 'elevenlabs';
 import clientPromise from '@/lib/mongodb';
+import createLogs from '../logs/allLogs';
 export const config = {
     api: {
         bodyParser: false,
@@ -35,7 +36,7 @@ export default async function dubbing(req, res) {
             });
         };
 
-        let videoUrl, sourceLang, targetLang, numSpeakers, name,email;
+        let videoUrl, sourceLang, targetLang, numSpeakers, name, email;
         let fileUploaded = null;
 
         if (req.headers['content-type']?.includes('multipart/form-data')) {
@@ -71,7 +72,7 @@ export default async function dubbing(req, res) {
 
             result = await client.dubbing.dubAVideoOrAnAudioFile({
                 name: name,
-                file:fileBlob,
+                file: fileBlob,
                 source_lang: sourceLang,
                 target_lang: targetLang,
                 num_speakers: parseInt(numSpeakers),
@@ -80,7 +81,7 @@ export default async function dubbing(req, res) {
 
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
-              }
+            }
 
         } else if (videoUrl) {
             result = await client.dubbing.dubAVideoOrAnAudioFile({
@@ -95,13 +96,22 @@ export default async function dubbing(req, res) {
             return res.status(400).json({ error: 'Debe enviar una URL o un archivo de video.' });
         }
 
-        const clientMongo=await clientPromise;
+        const clientMongo = await clientPromise;
         const db = clientMongo.db("proyecto_educa");
         const collect = db.collection("dubbing");
-        const videoDubbed={idVideo:result.dubbing_id,name:name,targetLang:targetLang,email:email,status:"creating"};
-        await collect.insertOne(videoDubbed);
+        const videoDubbed = { idVideo: result.dubbing_id, name: name, targetLang: targetLang, email: email, status: "creating",date: new Date().toISOString() };
 
-        return res.status(200).json(result);
+        await collect.insertOne(videoDubbed);
+        await createLogs(email, 'dubbing', {
+            idVideo: result.dubbing_id,
+            name,
+            sourceLang,
+            targetLang,
+            date: new Date().toISOString()
+        });
+        
+        return res.status(200).json(result); 
+
     } catch (error) {
         console.error('Error en el proceso de doblaje:', error);
         return res.status(500).json({ error: error.message || 'Error interno en el servidor' });

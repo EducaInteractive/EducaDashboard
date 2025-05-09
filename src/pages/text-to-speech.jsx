@@ -4,7 +4,7 @@ import { CheckCircle } from 'lucide-react';
 import notyf from '@/utils/notificacion';
 import { getSession } from 'next-auth/react';
 import { useDisabled } from '@/contexts/DisabledContext';
-
+import { useSession } from 'next-auth/react';
 export async function getServerSideProps(context) {
   const session = await getSession(context);
 
@@ -42,7 +42,7 @@ function TextToSpeech({ voices }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [audioUrl, setAudioUrl] = useState('');
-
+  const {data: session} = useSession()
 
   useEffect(() => {
     if (isSuccess) {
@@ -73,6 +73,7 @@ function TextToSpeech({ voices }) {
           stability: stability / 100,
           similarity_boost: similarity / 100,
           style_weight: style / 100,
+          email: session?.user?.email
         })
       });
 

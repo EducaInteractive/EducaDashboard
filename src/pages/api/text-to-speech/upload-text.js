@@ -1,11 +1,18 @@
 import { ElevenLabsClient } from "elevenlabs";
+import clientPromise from "@/lib/mongodb";
+import createLogs from "../logs/allLogs";
+
+const clientMongo = await clientPromise;
+const db = clientMongo.db("proyecto_educa");
+const collection = db.collection("logs");
+
 const client = new ElevenLabsClient({
   apiKey: process.env.ELEVEN_LAB_API_KEY
 });
 
 export default async function uploadText(req, res) {
   try {
-    const { text, voice, stability, similarity_boost, style_weight } = req.body;
+    const { text, voice, stability, similarity_boost, style_weight,email } = req.body;
 
     if(!text||!voice)return res.status(400).json({error:"Faltan datos"})
 
@@ -28,6 +35,15 @@ export default async function uploadText(req, res) {
 
 
     const audioBase64 = audioBuffer.toString('base64');
+
+    await createLogs(email, 'text_to_speech', {
+      text: text,
+      voice: voice,
+      stability: stability,
+      similarity_boost: similarity_boost,
+      style_weight: style_weight,
+      date: new Date().toISOString()
+    });
 
     return res.json({
       success: true,

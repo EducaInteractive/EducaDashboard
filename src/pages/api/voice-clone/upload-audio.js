@@ -2,6 +2,8 @@ import { IncomingForm } from "formidable";
 import { ElevenLabsClient } from "elevenlabs";
 import clientPromise from "@/lib/mongodb";
 import fs from "fs";
+import createLogs from "../logs/allLogs";
+
 
 export const config = {
   api: {
@@ -15,7 +17,7 @@ const client = new ElevenLabsClient({
   timeout: 120000,
 });
 
-const clientMongo=await clientPromise;
+const clientMongo = await clientPromise;
 const db = clientMongo.db("proyecto_educa");
 const collect = db.collection("voices");
 
@@ -53,13 +55,13 @@ export default async function uploadAudio(req, res) {
     const { fields, files } = await processForm();
 
     const file = Array.isArray(files.file) ? files.file[0] : files.file;
-    currentFile = file; 
+    currentFile = file;
 
     const name = Array.isArray(fields.name) ? fields.name[0] : fields.name;
 
     const noise = fields.noise == "true"
 
-    const description = Array.isArray(fields.description) ? fields.description[0] : " ";
+    const description = Array.isArray(fields.description) ? fields.description[0] : "Sin descripcion";
 
     const amountMaxVoices = Array.isArray(fields.amountMaxVoices) ? fields.amountMaxVoices[0] : 0;
 
@@ -67,49 +69,61 @@ export default async function uploadAudio(req, res) {
 
     const email = Array.isArray(fields.email) ? fields.email[0] : "";
 
-    if(amountVoicesClo==amountMaxVoices){
+
+    if (amountVoicesClo == amountMaxVoices) {
+      console.error("Limite de clonacion alcanzado:", amountVoicesClo, amountMaxVoices);
       throw new Error("Limite de clonacion alcanzado");
     }
 
     if (!file || !file.filepath || !name) {
+      console.error("Campos inválidos:", file, name);
       throw new Error("Campos inválidos");
     }
 
     if (!fs.existsSync(file.filepath)) {
+      console.error("Archivo no encontrado:", file.filepath);
       throw new Error("Archivo no encontrado");
     }
 
     const stats = fs.statSync(file.filepath);
     if (stats.size > 25 * 1024 * 1024) {
+      console.error("Archivo demasiado grande:", stats.size);
       throw new Error("Archivo demasiado grande");
     }
+
 
     const response = await client.voices.add({
       files: [fs.createReadStream(file.filepath)],
       name: name,
-      remove_background_noise:noise,
-      description:description
+      remove_background_noise: noise,
+      description: description
 
     });
+
 
     if (file.filepath && fs.existsSync(file.filepath)) {
       fs.unlinkSync(file.filepath);
     }
 
-    const existingDocument = await collect.findOne({ email:email });
-    const datenow=new Date();
+    const existingDocument = await collect.findOne({ email: email });
+    const datenow = new Date();
 
     if (existingDocument) {
       const existingVoice = existingDocument.voices.find(voice => voice.id === response.voice_id);
       if (!existingVoice) {
-        existingDocument.voices.push({id:response.voice_id,name:name,date:datenow});
+        existingDocument.voices.push({ id: response.voice_id, name: name, date: datenow });
         await collect.updateOne({ _id: existingDocument._id }, { $set: existingDocument });
       }
-    }else{
-      const newDocument = { email: email, voices: [{id:response.voice_id,name:name,date:datenow}] };
+    } else {
+      const newDocument = { email: email, voices: [{ id: response.voice_id, name: name, date: datenow }] };
       await collect.insertOne(newDocument);
     }
 
+    await createLogs(email, 'voices', {
+      idVoice: response.voice_id,
+      name: name,
+      date: datenow.toISOString()
+    });
 
     clearTimeout(timeout);
     return res.status(200).json({
